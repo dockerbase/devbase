@@ -19,3 +19,6 @@ This repository contains **Dockerbase** of Devbase - a base container of develop
 ### Usage
 
     docker run -it --rm --name dockerbase-devbase dockerbase/devbase
+
+### Information
+[Components & Versions](https://github.com/dockerbase/devbase/blob/master/COMPONENTS)
