@@ -1,5 +1,5 @@
 NAME = dockerbase/devbase
-VERSION = 1.0
+VERSION = 1.1
 
 .PHONY: all build test tag_latest release ssh enter
 
@@ -12,18 +12,16 @@ test:
 	docker run -it --rm $(NAME):$(VERSION) echo hello world!
 
 run:
-	docker run -it --rm --name dockerbase-devbase $(NAME):$(VERSION)
-
-ls_volume:
-	@ID=$$(docker ps | grep -F "$(NAME):$(VERSION)" | awk '{ print $$1 }') && \
-                if test "$$ID" = ""; then echo "Container is not running."; exit 1; fi && \
-                DIR=$$(docker inspect $$ID | python -c 'import json,sys; obj=json.load(sys.stdin); print obj[0]["Volumes"]["/etc/nginx/sites-enabled"]') && \
-                echo "looking at $$DIR" && \
-		ls -ls $$DIR
+	docker run -it --rm --name $(subst /,-,$(NAME)) $(NAME):$(VERSION)
 
 version:
-	docker run -it --rm $(NAME):$(VERSION) sh -c ' lsb_release -d ; git --version ; ruby -v ; ssh -V ; make -v ' | tee COMPONENTS
+	docker run -it --rm $(NAME):$(VERSION) sh -c ' lsb_release -d ; git --version ; ssh -V ; make -v ' | tee COMPONENTS
 	dos2unix COMPONENTS
+	sed -i -e 's/^/    /' COMPONENTS
+	sed -i -e '/^### Components & Versions/q' README.md
+	echo >> README.md
+	cat COMPONENTS >> README.md
+	rm COMPONENTS
 
 tag_latest:
 	docker tag $(NAME):$(VERSION) $(NAME):latest
